@@ -78,12 +78,12 @@ int main( int argc, char** argv )
         unsigned int format7_width;
         unsigned int format7_height;
         unsigned int format7_size;
-        unsigned int exposure;
         boost::program_options::options_description description( "options" );
         description.add_options()
             ( "help,h", "display help message" )
             ( "long-help", "display long help message" )
             ( "list", "list cameras on the bus with guids" )
+            ( "list-attributes", "output current camera attributes" )
             ( "discard,d", "discard frames, if cannot keep up; same as --buffer=1" )
             ( "config,c", boost::program_options::value< std::string >( &config_string )->default_value( "fire-cat.ini" ), "configuration file for the camera or semicolon-separated name=value string, see long help for details" )
             ( "buffer", boost::program_options::value< unsigned int >( &discard )->default_value( 0 ), "maximum buffer size before discarding frames, default: unlimited" )
@@ -92,8 +92,7 @@ int main( int argc, char** argv )
             ( "no-header", "output image data only" )
             ( "width", boost::program_options::value< unsigned int >( &format7_width )->default_value( 0 ), "set width in format7 mode, default: 0 = maximum supported" )
             ( "height", boost::program_options::value< unsigned int >( &format7_height )->default_value( 0 ), "set height in format7 mode, default: 0 = maximum supported" )
-            ( "packet-size", boost::program_options::value< unsigned int >( &format7_size )->default_value( 8160 ), "set packet size in format7 mode" )
-            ( "exposure", boost::program_options::value< unsigned int >( &exposure )->default_value( 0 ), "set auto exposure, default 0: disabled" );
+            ( "packet-size", boost::program_options::value< unsigned int >( &format7_size )->default_value( 8160 ), "set packet size in format7 mode" );
 
         boost::program_options::variables_map vm;
         boost::program_options::store( boost::program_options::parse_command_line( argc, argv, description), vm );
@@ -130,6 +129,7 @@ int main( int argc, char** argv )
                 std::cerr << "\tgain: camera gain (absolute)" << std::endl;
                 std::cerr << "\trelative-shutter: camera shutter speed (relative)" << std::endl;
                 std::cerr << "\trelative-gain: camera gain (relative)" << std::endl;
+                std::cerr << "\texposure: camera exposure" << std::endl;
                 std::cerr << std::endl << "allowed output types: " << std::endl;
                 std::cerr << "\tRGB: convert the camera output to RGB8 using dc1394_convert_frames" << std::endl;
                 std::cerr << "\tBGR: convert the camera output to BGR8 using dc1394_convert_frames" << std::endl;
@@ -212,7 +212,14 @@ int main( int argc, char** argv )
             comma::name_value::parser parser( ';', '=' );
             config = parser.get< snark::camera::dc1394::config >( config_string );
         }
-        snark::camera::dc1394 camera( config, format7_width, format7_height, format7_size, exposure );
+        snark::camera::dc1394 camera( config, format7_width, format7_height, format7_size);
+        
+        if( vm.count( "list-attributes" ) )
+        {
+            camera.list_attributes();    
+            return 0;
+        }
+
         snark::tbb::bursty_reader< Pair > reader( boost::bind( &capture, boost::ref( camera ) ), discard );
         snark::imaging::applications::pipeline pipeline( *serialization, filters, reader );
         pipeline.run();

@@ -52,26 +52,30 @@ public:
         unsigned int relative_gain;
         float shutter; // 0 means do not change
         float gain;
+        unsigned int exposure;
         uint64_t guid;
     };
 
 // DC1394_FEATURE_SHUTTER,
 //   DC1394_FEATURE_GAIN,
     
-    dc1394( const config& config = config(), unsigned int format7_width = 0, unsigned int format7_height = 0, unsigned int format7_size = 8160, unsigned int exposure = 0 );
+    dc1394( const config& config = config(), unsigned int format7_width = 0, unsigned int format7_height = 0, unsigned int format7_size = 8160);
     ~dc1394();
 
     const cv::Mat& read();
     boost::posix_time::ptime time() const { return m_time; }
     bool poll();
     static void list_cameras();
+    void list_attributes();
 
 private:
     void init_camera();
     void setup_camera();
     void setup_camera_format7();
-    void set_exposure( float shutter, float gain );
-    void set_exposure( unsigned int shutter, unsigned int gain );
+
+    void set_absolute_shutter_gain( float shutter, float gain );
+    void set_relative_shutter_gain( unsigned int shutter, unsigned int gain );
+    void set_exposure( unsigned int exposure );
     
     config m_config;
     dc1394camera_t* m_camera;
@@ -88,10 +92,6 @@ private:
     unsigned int m_format7_width;
     unsigned int m_format7_height;
     unsigned int m_format7_size;
-    boost::optional< unsigned int > m_auto_exposure;
-    boost::optional< unsigned int > m_adjusted_exposure;
-    boost::posix_time::ptime m_last_shutter_update;
-    
 };
 
 } } // namespace snark { namespace camera {
@@ -136,6 +136,7 @@ template <> struct traits< snark::camera::dc1394::config >
         v.apply( "relative-gain", c.relative_gain );
         v.apply( "shutter", c.shutter );
         v.apply( "gain", c.gain );
+        v.apply( "exposure", c.exposure );
         v.apply( "guid", c.guid );
     }
 
@@ -170,6 +171,7 @@ template <> struct traits< snark::camera::dc1394::config >
         v.apply( "relative-gain", c.relative_gain );
         v.apply( "shutter", c.shutter );
         v.apply( "gain", c.gain );
+        v.apply( "exposure", c.exposure );
         v.apply( "guid", c.guid );
     }
 };
