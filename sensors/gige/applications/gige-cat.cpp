@@ -39,7 +39,7 @@ int main( int argc, char** argv )
         boost::program_options::options_description description( "options" );
         description.add_options()
             ( "help,h", "display help message" )
-            ( "set", boost::program_options::value< std::string >( &setattributes ), "set camera attributes as comma-separated name-value pairs" )
+            ( "set", boost::program_options::value< std::string >( &setattributes ), "set camera attributes as semicolon-separated name-value pairs" )
             ( "set-and-exit", "set camera attributes specified in --set and exit" )
             ( "id", boost::program_options::value< unsigned int >( &id )->default_value( 0 ), "camera id; default: first available camera" )
             ( "discard", "discard frames, if cannot keep up; same as --buffer=1" )
@@ -86,7 +86,7 @@ int main( int argc, char** argv )
         snark::camera::gige::attributes_type attributes;
         if( vm.count( "set" ) )
         {
-            comma::name_value::map m( setattributes, ',', '=' );
+            comma::name_value::map m( setattributes, ';', '=' );
             attributes.insert( m.get().begin(), m.get().end() );
         }
         if( verbose ) { std::cerr << "gige-cat: connecting..." << std::endl; }
