@@ -44,7 +44,7 @@ int main( int ac, char** av )
     }
     cv::Mat image = cv::imread( av[1], 1 );
     cv::Mat binary;
-    cv::threshold( image, binary, 128, 255, CV_THRESH_BINARY_INV );
+    cv::threshold( image, binary, 128, 255, cv::THRESH_BINARY_INV );
     snark::imaging::region_properties properties( binary );
     properties.show( image );
     cv::imshow( "image", image );
