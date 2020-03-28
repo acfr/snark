@@ -155,7 +155,7 @@ SET(snark_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 IF( NOT BUILD_SHARED_LIBS )
     SET( Boost_USE_STATIC_LIBS ON )
 ENDIF( NOT BUILD_SHARED_LIBS )
-FIND_PACKAGE( Boost COMPONENTS thread filesystem system serialization date_time program_options )
+FIND_PACKAGE( Boost COMPONENTS thread filesystem system serialization date_time program_options regex )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
 LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
 
