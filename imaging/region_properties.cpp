@@ -73,7 +73,7 @@ region_properties::region_properties ( const cv::Mat& image, double minArea ):
     cv::Mat binary;
     if( image.channels() == 3 )
     {
-        cv::cvtColor( image, binary, CV_RGB2GRAY );
+        cv::cvtColor( image, binary, cv::COLOR_RGB2GRAY );
     }
     else if( image.channels() == 1 )
     {
@@ -86,12 +86,12 @@ region_properties::region_properties ( const cv::Mat& image, double minArea ):
 //     cv::Mat closed;
 //     cv::morphologyEx( binary, closed, cv::MORPH_CLOSE, cv::Mat::ones( 3, 3, CV_8U) );
     std::vector< std::vector<cv::Point> > contours;
-    cv::findContours( binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE );
+    cv::findContours( binary, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE );
     
     for( unsigned int i = 0; i < contours.size(); i++ )
     {
         binary = cv::Scalar(0);
-        cv::drawContours( binary, contours, i, cv::Scalar(0xFF), CV_FILLED );
+        cv::drawContours( binary, contours, i, cv::Scalar(0xFF), cv::FILLED );
         cv::Rect rect = cv::boundingRect( cv::Mat( contours[i]) );
         cv::Moments moments = cv::moments( binary( rect ), true );
         double x = moments.m10/moments.m00;

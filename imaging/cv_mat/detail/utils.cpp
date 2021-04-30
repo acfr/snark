@@ -171,7 +171,7 @@ std::string make_filename( const boost::posix_time::ptime& t, const std::string&
 std::vector< int > imwrite_params( const std::string& type, const int quality )
 {
     std::vector< int > params;
-    if ( type == "jpg" ) { params.push_back( CV_IMWRITE_JPEG_QUALITY ); }
+    if ( type == "jpg" ) { params.push_back( cv::IMWRITE_JPEG_QUALITY ); }
     else { COMMA_THROW( comma::exception, "quality only supported for jpg images, not for \"" << type << "\" yet" ); }
     params.push_back( quality );
     return params;

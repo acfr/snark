@@ -350,7 +350,7 @@ static void output_once_( const boost::posix_time::ptime& t )
 
 static void output_()
 {
-    static const boost::posix_time::time_duration period = boost::posix_time::milliseconds( 1000.0 / *fps );
+    static const boost::posix_time::time_duration period = boost::posix_time::milliseconds( (long)(1000.0 / *fps) );
     static const boost::posix_time::time_duration timeout = boost::posix_time::milliseconds( 10 );
     boost::posix_time::ptime time_to_output = boost::posix_time::microsec_clock::universal_time() + period;    
     while( !is_shutdown && !done && std::cout.good() )

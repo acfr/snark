@@ -53,6 +53,7 @@
 #include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
+#include <opencv2/calib3d.hpp>
 #if CV_MAJOR_VERSION <= 2
 #include <opencv2/contrib/contrib.hpp>
 #endif // #if CV_MAJOR_VERSION <= 2

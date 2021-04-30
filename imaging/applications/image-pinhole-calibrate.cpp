@@ -175,7 +175,7 @@ static double reprojection_error( const std::vector< std::vector< cv::Point3f > 
     for( unsigned int i = 0; i < object_points.size(); ++i )
     {
         cv::projectPoints( cv::Mat( object_points[i] ), rvecs[i], tvecs[i], camera_matrix, distortion_coefficients, image_points_2 );
-        double err = cv::norm( cv::Mat( image_points[i] ), cv::Mat( image_points_2 ), CV_L2 );
+        double err = cv::norm( cv::Mat( image_points[i] ), cv::Mat( image_points_2 ), cv::NORM_L2 );
         unsigned int n = object_points[i].size();
         per_view_errors[i] = std::sqrt( err * err / n );
         total_error += err * err;
@@ -196,7 +196,7 @@ static bool calibrate( const std::vector< cv::Point3f >& pattern_corners
 {
     std::vector< float > reprojection_errors;
     std::vector< std::vector< cv::Point3f > > object_points( image_points.size(), pattern_corners );
-    cv::calibrateCamera( object_points, image_points, image_size, camera_matrix, distortion_coefficients, rvecs, tvecs, flags | CV_CALIB_FIX_K4 | CV_CALIB_FIX_K5 );
+    cv::calibrateCamera( object_points, image_points, image_size, camera_matrix, distortion_coefficients, rvecs, tvecs, flags | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5 );
     bool ok = cv::checkRange( camera_matrix ) && cv::checkRange( distortion_coefficients );
     total_average_error = reprojection_error( object_points, image_points, rvecs, tvecs, camera_matrix, distortion_coefficients, reprojection_errors );
     return ok;
@@ -284,9 +284,9 @@ int main( int ac, char** av )
         if( pattern == patterns::invalid ) { std::cerr << "image-pinhole-calibration: expected calibration pattern, got: \"" << pattern_string << "\"" << std::endl; }
         float square_size = options.value< float >( "--pattern-square-size,--square-size", 1 ); 
         int flags = 0;
-        if( options.exists( "--no-principal-point" ) ) { flags |= CV_CALIB_FIX_PRINCIPAL_POINT; }
-        if( options.exists( "--no-tangential-distortion" ) ) { flags |= CV_CALIB_ZERO_TANGENT_DIST; }
-        if( options.exists( "--no-aspect-ratio" ) ) { flags |= CV_CALIB_FIX_ASPECT_RATIO; }
+        if( options.exists( "--no-principal-point" ) ) { flags |= cv::CALIB_FIX_PRINCIPAL_POINT; }
+        if( options.exists( "--no-tangential-distortion" ) ) { flags |= cv::CALIB_ZERO_TANGENT_DIST; }
+        if( options.exists( "--no-aspect-ratio" ) ) { flags |= cv::CALIB_FIX_ASPECT_RATIO; }
         bool view = options.exists( "--view" );
         bool verbose = options.exists( "--verbose,-v" );
         std::vector< std::vector< cv::Point2f > > image_points;
@@ -307,7 +307,7 @@ int main( int ac, char** av )
             //if( view ) { images.push_back( pair.second.clone() ); }
             image_size = pair.second.size();
             std::vector< cv::Point2f > points;
-            bool found = pattern == patterns::chessboard ? cv::findChessboardCorners( pair.second, pattern_size, points, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE )
+            bool found = pattern == patterns::chessboard ? cv::findChessboardCorners( pair.second, pattern_size, points, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE )
                        : pattern == patterns::circles_grid ? findCirclesGrid( view, pattern_size, points )
                        : pattern == patterns::asymmetric_circles_grid ? findCirclesGrid( view, pattern_size, points, cv::CALIB_CB_ASYMMETRIC_GRID )
                        : false;
@@ -324,7 +324,7 @@ int main( int ac, char** av )
             {
                 cv::Mat grey;
                 cv::cvtColor( pair.second, grey, cv::COLOR_BGR2GRAY );
-                cv::cornerSubPix( grey, points, cv::Size( 11, 11 ), cv::Size( -1, -1 ), cv::TermCriteria( CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1 ) );
+                cv::cornerSubPix( grey, points, cv::Size( 11, 11 ), cv::Size( -1, -1 ), cv::TermCriteria( cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1 ) );
             }
             image_points.push_back( points );
             timestamps.push_back( pair.first );
@@ -368,7 +368,7 @@ int main( int ac, char** av )
         else 
         {
             // set flag to use values from config
-            if (options.exists("--config")) { flags |= CV_CALIB_USE_INTRINSIC_GUESS; }
+            if (options.exists("--config")) { flags |= cv::CALIB_USE_INTRINSIC_GUESS; }
             if( !calibrate( pattern_corners, *image_size, image_points, flags, camera_matrix, distortion_coefficients, rvecs, tvecs, output.total_average_error ) ) { std::cerr << "image-pinhole-calibrate: calibration failed" << std::endl; return 1; }
         }
         for( unsigned int i = 0; i < images.size(); ++i )
@@ -381,7 +381,7 @@ int main( int ac, char** av )
         if( verbose ) { std::cerr << "image-pinhole-calibrate: outputting..." << std::endl; }
         output.pinhole.image_size = Eigen::Vector2i( image_size->width, image_size->height );
         output.pinhole.principal_point = Eigen::Vector2d( camera_matrix.at< double >( 0, 2 ), camera_matrix.at< double >( 1, 2 ) );
-        if( flags & CV_CALIB_FIX_ASPECT_RATIO )
+        if( flags & cv::CALIB_FIX_ASPECT_RATIO )
         {
             output.pinhole.focal_length = camera_matrix.at< double >( 0, 0 );
         }

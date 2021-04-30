@@ -78,7 +78,7 @@ cv::Mat frequency_domain::filter( const cv::Mat& image, const cv::Mat& mask )
         cv::multiply( abs, paddedMaskF, abs );
     }
     cv::Mat result;
-    cv::normalize( abs, abs, 0, maxValue, CV_MINMAX ); // scale to get the same max value as the original TODO better scaling ?
+    cv::normalize( abs, abs, 0, maxValue, cv::NORM_MINMAX ); // scale to get the same max value as the original TODO better scaling ?
     abs.convertTo( result, CV_8U );
     return result;
 }
@@ -101,7 +101,7 @@ cv::Mat frequency_domain::magnitude() const
     shift( magnitudeImage );
     
  // transform the matrix with float values into a viewable image form (float between values 0 and 1).
-    cv::normalize( magnitudeImage, magnitudeImage, 0, 1, CV_MINMAX );
+    cv::normalize( magnitudeImage, magnitudeImage, 0, 1, cv::NORM_MINMAX );
     return magnitudeImage;
 }
 
